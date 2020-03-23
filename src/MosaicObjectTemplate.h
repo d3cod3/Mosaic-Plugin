@@ -14,6 +14,8 @@ public:
   void            drawObjectContent(ofxFontStash *font);
   void            removeObjectContent(bool removeFileFromData=false);
 
+  std::shared_ptr<ofBaseRenderer> mainRenderer;
+
 
   OBJECT_FACTORY_PROPS
 
