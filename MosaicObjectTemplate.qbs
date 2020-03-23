@@ -9,7 +9,7 @@ Project{
     property string of_root: '../../..'
 
     ofApp {
-        name: { return FileInfo.baseName(sourceDirectory) }
+        name: "MosaicObjectTemplate"
 
         type: "dynamiclibrary"
 
