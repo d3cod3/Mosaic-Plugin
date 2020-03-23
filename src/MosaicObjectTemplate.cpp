@@ -59,6 +59,7 @@ void MosaicObjectTemplate::newObject(){
 
 //--------------------------------------------------------------
 void MosaicObjectTemplate::setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow){
+    ofSetCurrentRenderer(mainWindow->renderer());
 
 }
 
@@ -73,10 +74,10 @@ void MosaicObjectTemplate::updateObjectContent(map<int,shared_ptr<PatchObject>> 
 
 //--------------------------------------------------------------
 void MosaicObjectTemplate::drawObjectContent(ofxFontStash *font){
-    /*ofSetColor(255);
+    ofSetColor(255);
     ofEnableAlphaBlending();
-
-    ofDisableAlphaBlending();*/
+    ofDrawCircle(20,20,60);
+    ofDisableAlphaBlending();
 }
 
 //--------------------------------------------------------------

@@ -31,8 +31,11 @@
 *.out
 *.app
 
-# build folder
-build/*
+# build folders
+bin/*
 
 # osx commons
 .DS_Store
+
+#
+MosaicObjectTemplate.qbs.user
