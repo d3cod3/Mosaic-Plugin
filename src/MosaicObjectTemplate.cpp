@@ -35,6 +35,7 @@
 //--------------------------------------------------------------
 MosaicObjectTemplate::MosaicObjectTemplate() : PatchObject(){
 
+    // SET YOUR INLETS/OUTLETS
     this->numInlets  = 1;
     this->numOutlets = 1;
 
@@ -46,38 +47,62 @@ MosaicObjectTemplate::MosaicObjectTemplate() : PatchObject(){
 
     this->initInletsState();
 
-
 }
 
 //--------------------------------------------------------------
 void MosaicObjectTemplate::newObject(){
+    // SET OBJECT NAME AND INLETS/OUTLETS TYPES/NAMES
     this->setName(this->objectName);
     this->addInlet(VP_LINK_NUMERIC,"number");
     this->addOutlet(VP_LINK_NUMERIC,"number");
-
 }
 
 //--------------------------------------------------------------
 void MosaicObjectTemplate::setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow){
-    mainRenderer = mainWindow->renderer();
+    //////////////////////////////////////////////
+    // LINK SHARED RENDERER
+    mainRenderer.setup(mainWindow->renderer());
+    //////////////////////////////////////////////
 
+    //////////////////////////////////////////////
+    // YOUR SETUP CODE
+
+
+    //////////////////////////////////////////////
 }
 
 //--------------------------------------------------------------
 void MosaicObjectTemplate::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects, ofxThreadedFileDialog &fd){
 
+    //////////////////////////////////////////////
+    // YOUR UPDATE CODE
     if(this->inletsConnected[0]){
         *(float *)&_outletParams[0] = *(float *)&_inletParams[0];
     }
+    //////////////////////////////////////////////
 
 }
 
 //--------------------------------------------------------------
 void MosaicObjectTemplate::drawObjectContent(ofxFontStash *font){
-    mainRenderer->setColor(255);
-    mainRenderer->setBlendMode(OF_BLENDMODE_ALPHA);
-    mainRenderer->drawCircle(this->width/2,this->height/2,0,10);
-    mainRenderer->setBlendMode(OF_BLENDMODE_DISABLED);
+
+    /*
+        Due to rendering sharing needs, use internal mpGraphics methods
+        instead of starndard OF methods for drawing
+
+        ex. ofSetColor --> mainRenderer.ofSetColor()
+            or:
+        ofVideoPlayer video;
+        video.load("video.mp4");
+
+        video.draw(0,0); --> mainRenderer.draw(video,0,0);
+     */
+
+    //////////////////////////////////////////////
+    // YOUR DRAW CODE
+    mainRenderer.ofSetColor(255,255,255);
+    //////////////////////////////////////////////
+
 }
 
 //--------------------------------------------------------------
@@ -86,4 +111,5 @@ void MosaicObjectTemplate::removeObjectContent(bool removeFileFromData){
 }
 
 
+// REGISTER THE OBJECT
 OBJECT_REGISTER( MosaicObjectTemplate, "object template", OFXVP_OBJECT_CAT_DATA)

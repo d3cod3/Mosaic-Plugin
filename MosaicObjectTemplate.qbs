@@ -14,6 +14,7 @@ Project{
         type: "dynamiclibrary"
 
         files: [
+            'src/mpGraphics.h',
             'src/plugin.cpp',
             'src/MosaicObjectTemplate.cpp',
             'src/MosaicObjectTemplate.h',
