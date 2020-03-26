@@ -30,35 +30,35 @@
 
 ==============================================================================*/
 
-#include "MosaicObjectTemplate.h"
+#include "VideoObject.h"
 
 //--------------------------------------------------------------
-MosaicObjectTemplate::MosaicObjectTemplate() : PatchObject(){
+VideoObject::VideoObject() : PatchObject(){
 
     // SET YOUR INLETS/OUTLETS
     this->numInlets  = 1;
     this->numOutlets = 1;
 
-    _inletParams[0] = new float();  // input
-    *(float *)&_inletParams[0] = 0.0f;
+    _inletParams[0] = new ofPixels();  // input
 
-    _outletParams[0] = new float(); // output
-    *(float *)&_outletParams[0] = 0.0f;
+    _outletParams[0] = new ofPixels(); // output
 
     this->initInletsState();
 
+    isTexInited = false;
+
 }
 
 //--------------------------------------------------------------
-void MosaicObjectTemplate::newObject(){
+void VideoObject::newObject(){
     // SET OBJECT NAME AND INLETS/OUTLETS TYPES/NAMES
     this->setName(this->objectName);
-    this->addInlet(VP_LINK_NUMERIC,"number");
-    this->addOutlet(VP_LINK_NUMERIC,"number");
+    this->addInlet(VP_LINK_PIXELS,"pixels");
+    this->addOutlet(VP_LINK_PIXELS,"pixels");
 }
 
 //--------------------------------------------------------------
-void MosaicObjectTemplate::setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow){
+void VideoObject::setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow){
     //////////////////////////////////////////////
     // LINK SHARED RENDERER
     mainRenderer.setup(mainWindow->renderer());
@@ -67,49 +67,68 @@ void MosaicObjectTemplate::setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainW
     //////////////////////////////////////////////
     // YOUR SETUP CODE
 
-
     //////////////////////////////////////////////
 }
 
 //--------------------------------------------------------------
-void MosaicObjectTemplate::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects, ofxThreadedFileDialog &fd){
+void VideoObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects, ofxThreadedFileDialog &fd){
 
     //////////////////////////////////////////////
     // YOUR UPDATE CODE
     if(this->inletsConnected[0]){
-        *(float *)&_outletParams[0] = *(float *)&_inletParams[0];
+        if(!isTexInited){
+            isTexInited = true;
+            if(static_cast<ofPixels *>(_inletParams[0])->getBitsPerPixel() == 8){
+                test.allocate(static_cast<ofPixels *>(_inletParams[0])->getWidth(),static_cast<ofPixels *>(_inletParams[0])->getHeight(),GL_LUMINANCE);
+            }else if(static_cast<ofPixels *>(_inletParams[0])->getBitsPerPixel() == 24){
+                test.allocate(static_cast<ofPixels *>(_inletParams[0])->getWidth(),static_cast<ofPixels *>(_inletParams[0])->getHeight(),GL_RGB);
+            }else if(static_cast<ofPixels *>(_inletParams[0])->getBitsPerPixel() == 32){
+                test.allocate(static_cast<ofPixels *>(_inletParams[0])->getWidth(),static_cast<ofPixels *>(_inletParams[0])->getHeight(),GL_RGBA);
+            }
+
+        }
+        // get data from ofPixels inlet
+        test.loadData(*static_cast<ofPixels *>(_inletParams[0]));
+
+        // do some work on your internal ofTexture
+        // ...........
+
+        // copy back ofTexture data to ofPixels outlet
+        test.readToPixels(*static_cast<ofPixels *>(_outletParams[0]));
+    }else{
+        isTexInited = false;
     }
     //////////////////////////////////////////////
 
 }
 
 //--------------------------------------------------------------
-void MosaicObjectTemplate::drawObjectContent(ofxFontStash *font){
+void VideoObject::drawObjectContent(ofxFontStash *font){
 
     /*
-        Due to rendering sharing needs, use internal mpGraphics methods
+        Due to renderer sharing needs, use internal mpGraphics methods
         instead of starndard OF methods for drawing
 
         ex. ofSetColor --> mainRenderer.ofSetColor()
-            or:
-        ofVideoPlayer video;
-        video.load("video.mp4");
-
-        video.draw(0,0); --> mainRenderer.draw(video,0,0);
      */
 
     //////////////////////////////////////////////
     // YOUR DRAW CODE
+
     mainRenderer.ofSetColor(255,255,255);
+
+    mainRenderer.ofEnableAlphaBlending();
+
+    mainRenderer.ofDisableAlphaBlending();
     //////////////////////////////////////////////
 
 }
 
 //--------------------------------------------------------------
-void MosaicObjectTemplate::removeObjectContent(bool removeFileFromData){
+void VideoObject::removeObjectContent(bool removeFileFromData){
 
 }
 
 
 // REGISTER THE OBJECT
-OBJECT_REGISTER( MosaicObjectTemplate, "object template", OFXVP_OBJECT_CAT_DATA)
+OBJECT_REGISTER( VideoObject, "video object", OFXVP_OBJECT_CAT_VIDEO)

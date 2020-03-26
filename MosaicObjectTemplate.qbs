@@ -16,8 +16,12 @@ Project{
         files: [
             'src/mpGraphics.h',
             'src/plugin.cpp',
-            'src/MosaicObjectTemplate.cpp',
-            'src/MosaicObjectTemplate.h',
+            'src/NumberObject.cpp',
+            'src/NumberObject.h',
+            'src/StringObject.cpp',
+            'src/StringObject.h',
+            'src/VideoObject.cpp',
+            'src/VideoObject.h',
         ]
 
         of.addons: [

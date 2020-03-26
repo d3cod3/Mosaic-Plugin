@@ -1,14 +1,15 @@
 #pragma once
 
 #include "PatchObject.h"
+
 #include "mpGraphics.h"
 
-class MosaicObjectTemplate : public PatchObject {
+class VideoObject : public PatchObject {
 
 public:
 
     // CONSTRUCTOR
-  MosaicObjectTemplate();
+  VideoObject();
 
   // BASIC METHODS
 
@@ -47,6 +48,9 @@ public:
   //void              resetSystemObject();
   //void              resetResolution(int fromID=-1, int newWidth=-1, int newHeight=-1);
 
+  ofTexture           test;
+  bool                isTexInited;
+
 
 protected:
   mpGraphics      mainRenderer;
@@ -57,9 +61,9 @@ protected:
 };
 
 
-class MosaicObjectTemplateDriver : public PatchObjectDriver
+class VideoObjectDriver : public PatchObjectDriver
 {
 public:
-    MosaicObjectTemplateDriver() : PatchObjectDriver("MosaicObjectTemplateDriver", MosaicObjectTemplate::version) {}
-    PatchObject* create() {return new MosaicObjectTemplate();}
+    VideoObjectDriver() : PatchObjectDriver("VideoObjectDriver", VideoObject::version) {}
+    PatchObject* create() {return new VideoObject();}
 };

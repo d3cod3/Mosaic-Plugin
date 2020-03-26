@@ -1,16 +1,20 @@
 #pragma once
 
 #include "ofConstants.h"
+#include "ofGLProgrammableRenderer.h"
+#include "ofGraphicsConstants.h"
 #include "ofGraphicsBaseTypes.h"
 #include "ofRectangle.h"
 #include "ofRendererCollection.h"
 #include "ofCairoRenderer.h"
+#include "ofGLUtils.h"
 #include "ofGLRenderer.h"
 #include "ofImage.h"
 #include "ofPath.h"
 #include "ofTrueTypeFont.h"
 #include "ofVideoGrabber.h"
 #include "ofVideoPlayer.h"
+#include "ofVideoBaseTypes.h"
 
 // bridge class to use OF renderer calls with shared renderer (Mosaic plugin system)
 
@@ -23,7 +27,10 @@ public:
   //------------------------------------------------------------------------------
   //------------------------------------------------------------------------------
   mpGraphics() {}
-  void setup(std::shared_ptr<ofBaseRenderer> _r) { mainRenderer = _r; }
+
+  void setup(std::shared_ptr<ofBaseRenderer> _r) {
+      mainRenderer = _r;
+  }
   //------------------------------------------------------------------------------
   //------------------------------------------------------------------------------
   //------------------------------------------------------------------------------
@@ -220,68 +227,70 @@ public:
   void ofDrawRectRounded(float x, float y, float z, float w, float h, float r){	ofDrawRectRounded(x,y,z,w,h,r,r,r,r); }
   void ofDrawRectRounded(const glm::vec3 & p, float w, float h, float topLeftRadius,float topRightRadius,float bottomRightRadius,float bottomLeftRadius){	ofDrawRectRounded(p.x,p.y,p.z,w,h,topLeftRadius,topRightRadius,bottomRightRadius,bottomLeftRadius); }
   void ofDrawRectRounded(const glm::vec2 & p, float w, float h, float topLeftRadius,float topRightRadius,float bottomRightRadius,float bottomLeftRadius){	ofDrawRectRounded(p.x,p.y,0.0,w,h,topLeftRadius,topRightRadius,bottomRightRadius,bottomLeftRadius); }
-  void ofDrawRectRounded(const ofRectangle & b, float topLeftRadius,float topRightRadius,float bottomRightRadius,float bottomLeftRadius) { ofDrawRectRounded(b.x,b.y,0.0f,b.width,b.height,topLeftRadius,topRightRadius,bottomRightRadius,bottomLeftRadius); }void ofDrawRectRounded(float x, float y, float z, float w, float h, float topLeftRadius,float topRightRadius,float bottomRightRadius,float bottomLeftRadius) {
+  void ofDrawRectRounded(const ofRectangle & b, float topLeftRadius,float topRightRadius,float bottomRightRadius,float bottomLeftRadius) { ofDrawRectRounded(b.x,b.y,0.0f,b.width,b.height,topLeftRadius,topRightRadius,bottomRightRadius,bottomLeftRadius); }
+  void ofDrawRectRounded(float x, float y, float z, float w, float h, float topLeftRadius,float topRightRadius,float bottomRightRadius,float bottomLeftRadius) {
       switch (ofGetRectMode()) {
       case OF_RECTMODE_CENTER:
-              x -= w / 2.0f;
-              y -= h / 2.0f;
-              break;
-          default:
-              break;
+          x -= w / 2.0f;
+          y -= h / 2.0f;
+          break;
+      default:
+          break;
       }
       mainRenderer->getPath().clear();
       mainRenderer->getPath().rectRounded(x,y,z,w,h,topLeftRadius,topRightRadius,bottomRightRadius,bottomLeftRadius);
-    mainRenderer->draw(mainRenderer->getPath());
+      mainRenderer->draw(mainRenderer->getPath());
   }
   void ofDrawCurve(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3){
-    mainRenderer->getPath().clear();
+      mainRenderer->getPath().clear();
       mainRenderer->getPath().curveTo(x0,y0);
       mainRenderer->getPath().curveTo(x1,y1);
       mainRenderer->getPath().curveTo(x2,y2);
       mainRenderer->getPath().curveTo(x3,y3);
-    mainRenderer->draw(mainRenderer->getPath());
+      mainRenderer->draw(mainRenderer->getPath());
   }
-  void ofDrawCurve(float x0, float y0, float z0, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3){	mainRenderer->getPath().clear();
+  void ofDrawCurve(float x0, float y0, float z0, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3){
+      mainRenderer->getPath().clear();
       mainRenderer->getPath().curveTo(x0,y0,z0);
       mainRenderer->getPath().curveTo(x1,y1,z1);
       mainRenderer->getPath().curveTo(x2,y2,z2);
       mainRenderer->getPath().curveTo(x3,y3,z3);
-    mainRenderer->draw(mainRenderer->getPath());
+      mainRenderer->draw(mainRenderer->getPath());
   }void ofDrawBezier(float x0, float y0, float x1, float y1, float x2, float y2, float x3, float y3){
-    mainRenderer->getPath().clear();
+      mainRenderer->getPath().clear();
       mainRenderer->getPath().moveTo(x0,y0);
       mainRenderer->getPath().bezierTo(x1,y1,x2,y2,x3,y3);
-    mainRenderer->draw(mainRenderer->getPath());
+      mainRenderer->draw(mainRenderer->getPath());
   }
   void ofDrawBezier(float x0, float y0, float z0, float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3){
-    mainRenderer->getPath().clear();
+      mainRenderer->getPath().clear();
       mainRenderer->getPath().moveTo(x0,y0,z0);
       mainRenderer->getPath().bezierTo(x1,y1,z1,x2,y2,z2,x3,y3,z3);
-    mainRenderer->draw(mainRenderer->getPath());
+      mainRenderer->draw(mainRenderer->getPath());
   }
-  void ofBeginShape(){	mainRenderer->getPath().clear(); }
-  void ofVertex(float x, float y){	mainRenderer->getPath().lineTo(x,y); }
+  void ofBeginShape(){ mainRenderer->getPath().clear(); }
+  void ofVertex(float x, float y){ mainRenderer->getPath().lineTo(x,y); }
   void ofVertex(float x, float y, float z){	mainRenderer->getPath().lineTo(x,y,z); }
-  void ofVertex(const glm::vec3 & p){	mainRenderer->getPath().lineTo(p); }
-  void ofVertex(const glm::vec2 & p){	mainRenderer->getPath().lineTo(glm::vec3(p, 0.0)); }
+  void ofVertex(const glm::vec3 & p){ mainRenderer->getPath().lineTo(p); }
+  void ofVertex(const glm::vec2 & p){ mainRenderer->getPath().lineTo(glm::vec3(p, 0.0)); }
   void ofVertices( const vector <glm::vec3> & polyPoints ){	for( const auto & p: polyPoints ){ mainRenderer->getPath().lineTo(p); } }
   void ofVertices( const vector <glm::vec2> & polyPoints ){	for( const auto & p: polyPoints ){ mainRenderer->getPath().lineTo(glm::vec3(p, 0.0)); } }
-  void ofVertices( const vector <ofVec3f> & polyPoints ){	for( const auto & p: polyPoints ){ mainRenderer->getPath().lineTo(p); } }
-  void ofVertices( const vector <ofVec2f> & polyPoints ){	for( const auto & p: polyPoints ){ mainRenderer->getPath().lineTo(p); } }
+  void ofVertices( const vector <ofVec3f> & polyPoints ){ for( const auto & p: polyPoints ){ mainRenderer->getPath().lineTo(p); } }
+  void ofVertices( const vector <ofVec2f> & polyPoints ){ for( const auto & p: polyPoints ){ mainRenderer->getPath().lineTo(p); } }
   void ofCurveVertex(float x, float y){	mainRenderer->getPath().curveTo(x,y); }
-  void ofCurveVertex(float x, float y, float z){	mainRenderer->getPath().curveTo(x,y,z); }
-  void ofCurveVertices( const vector <glm::vec3> & curvePoints){	for( const auto & p: curvePoints ){		mainRenderer->getPath().curveTo(p); } }
-  void ofCurveVertices( const vector <glm::vec2> & curvePoints){	for( const auto & p: curvePoints ){		mainRenderer->getPath().curveTo(glm::vec3(p, 0.0)); } }
-  void ofCurveVertices( const vector <ofVec3f> & curvePoints){	for( const auto & p: curvePoints ){		mainRenderer->getPath().curveTo(p); } }
-  void ofCurveVertices( const vector <ofVec2f> & curvePoints){	for( const auto & p: curvePoints ){		mainRenderer->getPath().curveTo(p); } }
+  void ofCurveVertex(float x, float y, float z){ mainRenderer->getPath().curveTo(x,y,z); }
+  void ofCurveVertices( const vector <glm::vec3> & curvePoints){ for( const auto & p: curvePoints ){	mainRenderer->getPath().curveTo(p); } }
+  void ofCurveVertices( const vector <glm::vec2> & curvePoints){ for( const auto & p: curvePoints ){	mainRenderer->getPath().curveTo(glm::vec3(p, 0.0)); } }
+  void ofCurveVertices( const vector <ofVec3f> & curvePoints){ for( const auto & p: curvePoints ){	mainRenderer->getPath().curveTo(p); } }
+  void ofCurveVertices( const vector <ofVec2f> & curvePoints){ for( const auto & p: curvePoints ){	mainRenderer->getPath().curveTo(p); } }
   void ofCurveVertex(const glm::vec3 & p){	mainRenderer->getPath().curveTo(p); }
   void ofCurveVertex(const glm::vec2 & p){	mainRenderer->getPath().curveTo(glm::vec3(p, 0.0)); }
   void ofBezierVertex(float x1, float y1, float x2, float y2, float x3, float y3){	mainRenderer->getPath().bezierTo(x1,y1,x2,y2,x3,y3); }
   void ofBezierVertex(const glm::vec3 & p1, const glm::vec3 & p2, const glm::vec3 & p3){	mainRenderer->getPath().bezierTo(p1, p2, p3); }
   void ofBezierVertex(const glm::vec2 & p1, const glm::vec2 & p2, const glm::vec2 & p3){	mainRenderer->getPath().bezierTo(glm::vec3(p1, 0.0), glm::vec3(p2,0.0), glm::vec3(p3,0.0)); }
   void ofBezierVertex(float x1, float y1, float z1, float x2, float y2, float z2, float x3, float y3, float z3){	mainRenderer->getPath().bezierTo(x1,y1,z1,x2,y2,z2,x3,y3,z3); }
-  void ofNextContour(bool bClose){ if (bClose){		mainRenderer->getPath().close(); } mainRenderer->getPath().newSubPath(); }
-  void ofEndShape(bool bClose){ if (bClose){		mainRenderer->getPath().close(); } mainRenderer->draw(mainRenderer->getPath()); }
+  void ofNextContour(bool bClose){ if (bClose){	mainRenderer->getPath().close(); } mainRenderer->getPath().newSubPath(); }
+  void ofEndShape(bool bClose){ if (bClose){ mainRenderer->getPath().close(); } mainRenderer->draw(mainRenderer->getPath()); }
 
   // ofImage
   void draw(ofImage & _i, float x, float y) { draw(_i,x,y,0,_i.getWidth(),_i.getHeight()); }
@@ -311,6 +320,6 @@ public:
   void draw(ofVideoPlayer & _v, float _x, float _y, float _w, float _h){ mainRenderer->draw(_v,_x,_y,_w,_h); }
 
   // MAIN RENDERER
-  std::shared_ptr<ofBaseRenderer> mainRenderer;
+  std::shared_ptr<ofBaseRenderer>   mainRenderer;
 
 };
