@@ -20,7 +20,7 @@ public:
   // object update
   void              updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects, ofxThreadedFileDialog &fd);
   // object draw
-  void              drawObjectContent(ofxFontStash *font);
+  void              drawObjectContent(ofxFontStash *font, shared_ptr<ofBaseGLRenderer>& glRenderer);
   // call on remove object
   void              removeObjectContent(bool removeFileFromData=false);
 
@@ -48,9 +48,10 @@ public:
   //void              resetSystemObject();
   //void              resetResolution(int fromID=-1, int newWidth=-1, int newHeight=-1);
 
-  ofTexture           test;
-  bool                isTexInited;
+  float             posX, posY, drawW, drawH;
 
+  ofTexture         bridgeIn1;
+  bool              isTexInited;
 
 protected:
   mpGraphics      mainRenderer;

@@ -19,7 +19,7 @@ public:
   // object update
   void              updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects, ofxThreadedFileDialog &fd);
   // object draw
-  void              drawObjectContent(ofxFontStash *font);
+  void              drawObjectContent(ofxFontStash *font, shared_ptr<ofBaseGLRenderer>& glRenderer);
   // call on remove object
   void              removeObjectContent(bool removeFileFromData=false);
 

@@ -39,22 +39,23 @@ VideoObject::VideoObject() : PatchObject(){
     this->numInlets  = 1;
     this->numOutlets = 1;
 
-    _inletParams[0] = new ofPixels();  // input
+    _inletParams[0] = new ofTexture();  // input
 
-    _outletParams[0] = new ofPixels(); // output
+    _outletParams[0] = new ofTexture(); // output
 
     this->initInletsState();
 
-    isTexInited = false;
+    posX = posY = drawW = drawH = 0.0f;
 
+    isTexInited = false;
 }
 
 //--------------------------------------------------------------
 void VideoObject::newObject(){
     // SET OBJECT NAME AND INLETS/OUTLETS TYPES/NAMES
     this->setName(this->objectName);
-    this->addInlet(VP_LINK_PIXELS,"pixels");
-    this->addOutlet(VP_LINK_PIXELS,"pixels");
+    this->addInlet(VP_LINK_TEXTURE,"texture");
+    this->addOutlet(VP_LINK_TEXTURE,"texture");
 }
 
 //--------------------------------------------------------------
@@ -75,26 +76,13 @@ void VideoObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObj
 
     //////////////////////////////////////////////
     // YOUR UPDATE CODE
-    if(this->inletsConnected[0]){
+    if(this->inletsConnected[0] && static_cast<ofTexture *>(_inletParams[0])->isAllocated()){
         if(!isTexInited){
             isTexInited = true;
-            if(static_cast<ofPixels *>(_inletParams[0])->getBitsPerPixel() == 8){
-                test.allocate(static_cast<ofPixels *>(_inletParams[0])->getWidth(),static_cast<ofPixels *>(_inletParams[0])->getHeight(),GL_LUMINANCE);
-            }else if(static_cast<ofPixels *>(_inletParams[0])->getBitsPerPixel() == 24){
-                test.allocate(static_cast<ofPixels *>(_inletParams[0])->getWidth(),static_cast<ofPixels *>(_inletParams[0])->getHeight(),GL_RGB);
-            }else if(static_cast<ofPixels *>(_inletParams[0])->getBitsPerPixel() == 32){
-                test.allocate(static_cast<ofPixels *>(_inletParams[0])->getWidth(),static_cast<ofPixels *>(_inletParams[0])->getHeight(),GL_RGBA);
-            }
-
+            bridgeIn1.allocate(static_cast<ofTexture *>(_inletParams[0])->getWidth(),static_cast<ofTexture *>(_inletParams[0])->getHeight(),static_cast<ofTexture *>(_inletParams[0])->getTextureData().glInternalFormat);
         }
-        // get data from ofPixels inlet
-        test.loadData(*static_cast<ofPixels *>(_inletParams[0]));
-
-        // do some work on your internal ofTexture
-        // ...........
-
-        // copy back ofTexture data to ofPixels outlet
-        test.readToPixels(*static_cast<ofPixels *>(_outletParams[0]));
+        bridgeIn1 = *static_cast<ofTexture *>(_inletParams[0]);
+        *static_cast<ofTexture *>(_outletParams[0]) = bridgeIn1;
     }else{
         isTexInited = false;
     }
@@ -103,7 +91,7 @@ void VideoObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObj
 }
 
 //--------------------------------------------------------------
-void VideoObject::drawObjectContent(ofxFontStash *font){
+void VideoObject::drawObjectContent(ofxFontStash *font, shared_ptr<ofBaseGLRenderer>& glRenderer){
 
     /*
         Due to renderer sharing needs, use internal mpGraphics methods
@@ -118,6 +106,28 @@ void VideoObject::drawObjectContent(ofxFontStash *font){
     mainRenderer.ofSetColor(255,255,255);
 
     mainRenderer.ofEnableAlphaBlending();
+
+    if(this->inletsConnected[0] && static_cast<ofTexture *>(_inletParams[0])->isAllocated()){
+        if(static_cast<ofTexture *>(_inletParams[0])->getWidth()/static_cast<ofTexture *>(_inletParams[0])->getHeight() >= this->width/this->height){
+            if(static_cast<ofTexture *>(_inletParams[0])->getWidth() > static_cast<ofTexture *>(_inletParams[0])->getHeight()){   // horizontal texture
+                drawW           = this->width;
+                drawH           = (this->width/static_cast<ofTexture *>(_inletParams[0])->getWidth())*static_cast<ofTexture *>(_inletParams[0])->getHeight();
+                posX            = 0;
+                posY            = (this->height-drawH)/2.0f;
+            }else{ // vertical texture
+                drawW           = (static_cast<ofTexture *>(_inletParams[0])->getWidth()*this->height)/static_cast<ofTexture *>(_inletParams[0])->getHeight();
+                drawH           = this->height;
+                posX            = (this->width-drawW)/2.0f;
+                posY            = 0;
+            }
+        }else{ // always considered vertical texture
+            drawW           = (static_cast<ofTexture *>(_inletParams[0])->getWidth()*this->height)/static_cast<ofTexture *>(_inletParams[0])->getHeight();
+            drawH           = this->height;
+            posX            = (this->width-drawW)/2.0f;
+            posY            = 0;
+        }
+        glRenderer->draw(bridgeIn1,posX,posY,0,drawW,drawH,0,0,static_cast<ofTexture *>(_inletParams[0])->getWidth(),static_cast<ofTexture *>(_inletParams[0])->getHeight());
+    }
 
     mainRenderer.ofDisableAlphaBlending();
     //////////////////////////////////////////////
