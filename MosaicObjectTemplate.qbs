@@ -16,6 +16,8 @@ Project{
         files: [
             'src/mpGraphics.h',
             'src/plugin.cpp',
+            'src/AudioObject.cpp',
+            'src/AudioObject.h',
             'src/NumberObject.cpp',
             'src/NumberObject.h',
             'src/StringObject.cpp',

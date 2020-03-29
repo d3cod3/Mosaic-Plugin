@@ -308,6 +308,9 @@ public:
   void draw(ofPath & _p){ mainRenderer->draw(_p); }
   void draw(ofPath & _p, float x, float y){ mainRenderer->draw(_p,x,y); }
 
+  // ofPolyline
+  void draw(ofPolyline & _p){ mainRenderer->draw(_p); }
+
   // ofTrueTypeFont
   void drawString(ofTrueTypeFont &_t, std::string &  c, float x, float y) { mainRenderer->drawString(_t,c,x,y); }
 
