@@ -33,7 +33,7 @@
 #include "StringObject.h"
 
 //--------------------------------------------------------------
-StringObject::StringObject() : PatchObject(){
+StringObject::StringObject() : PatchObject("string object"){
 
     // SET YOUR INLETS/OUTLETS
     this->numInlets  = 1;
@@ -52,8 +52,10 @@ StringObject::StringObject() : PatchObject(){
 //--------------------------------------------------------------
 void StringObject::newObject(){
     // SET OBJECT NAME AND INLETS/OUTLETS TYPES/NAMES
-    this->setName(this->objectName);
+    PatchObject::setName( this->objectName );
+
     this->addInlet(VP_LINK_STRING,"string");
+
     this->addOutlet(VP_LINK_STRING,"string");
 }
 
@@ -72,12 +74,12 @@ void StringObject::setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow){
 }
 
 //--------------------------------------------------------------
-void StringObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects, ofxThreadedFileDialog &fd){
+void StringObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects){
 
     //////////////////////////////////////////////
     // YOUR UPDATE CODE
     if(this->inletsConnected[0]){
-        *static_cast<string *>(_outletParams[10]) = *static_cast<string *>(_inletParams[0]);
+        *static_cast<string *>(_outletParams[0]) = *static_cast<string *>(_inletParams[0]);
     }
     //////////////////////////////////////////////
 
@@ -102,6 +104,41 @@ void StringObject::drawObjectContent(ofxFontStash *font, shared_ptr<ofBaseGLRend
     // YOUR DRAW CODE
     mainRenderer.ofSetColor(255,255,255);
     //////////////////////////////////////////////
+
+}
+
+//--------------------------------------------------------------
+void StringObject::drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ){
+
+    ImGui::SetCurrentContext(_nodeCanvas.getContext());
+
+    // CONFIG GUI inside Menu
+    if(_nodeCanvas.BeginNodeMenu()){
+
+        ImGui::Separator();
+        ImGui::Separator();
+        ImGui::Separator();
+
+        if (ImGui::BeginMenu("CONFIG"))
+        {
+
+            ImGuiEx::ObjectInfo(
+                        "Mosaic Plugin Example - String object.",
+                        "#", scaleFactor);
+
+            ImGui::EndMenu();
+        }
+
+        _nodeCanvas.EndNodeMenu();
+    }
+
+    // Visualize (Object main view)
+    if( _nodeCanvas.BeginNodeContent(ImGuiExNodeView_Visualise) ){
+
+
+
+        _nodeCanvas.EndNodeContent();
+    }
 
 }
 

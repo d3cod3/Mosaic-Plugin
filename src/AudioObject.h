@@ -3,6 +3,8 @@
 #include "PatchObject.h"
 #include "mpGraphics.h"
 
+#include "imgui_plot.h"
+
 class AudioObject : public PatchObject {
 
 public:
@@ -13,55 +15,50 @@ public:
   // BASIC METHODS
 
   // inlets/oulets instatiation
-  void              newObject();
+  void              newObject() override;
   // object setup
-  void              setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow);
+  void              setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow) override;
   // object update
-  void              updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects, ofxThreadedFileDialog &fd);
+  void              updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects) override;
   // object draw
-  void              drawObjectContent(ofxFontStash *font, shared_ptr<ofBaseGLRenderer>& glRenderer);
+  void              drawObjectContent(ofxFontStash *font, shared_ptr<ofBaseGLRenderer>& glRenderer) override;
+  void              drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ) override;
   // call on remove object
-  void              removeObjectContent(bool removeFileFromData=false);
+  void              removeObjectContent(bool removeFileFromData=false) override;
+
+  // ADVANCED METHODS
 
   // ADVANCED METHODS
 
   // file loading objects related methods
-  //void              autoloadFile(string _fp);
-  //void              autosaveNewFile(string fromFile);
-  //void              fileDialogResponse(ofxThreadedFileDialogResponse &response);
+  //void              autoloadFile(string _fp) override;
+  //void              autosaveNewFile(string fromFile) override;
 
   // audio objects related methods
-  void              setupAudioOutObjectContent(pdsp::Engine &engine);
-  void              audioInObject(ofSoundBuffer &inputBuffer);
-  void              audioOutObject(ofSoundBuffer &outputBuffer);
-
-  // embed GUI objects related methods (mouse, keyboard interaction)
-  //void              mouseMovedObjectContent(ofVec3f _m);
-  //void              mousePressedObjectContent(ofVec3f _m);
-  //void              mouseReleasedObjectContent(ofVec3f _m);
-  //void              keyPressedObjectContent(int key);
-  //void              dragGUIObject(ofVec3f _m);
+  void              setupAudioOutObjectContent(pdsp::Engine &engine) override;
+  void              audioInObject(ofSoundBuffer &inputBuffer) override;
+  void              audioOutObject(ofSoundBuffer &outputBuffer) override;
 
   // object reset methods
-  //void              customReset();
-  //void              resetSystemObject();
-  //void              resetResolution(int fromID=-1, int newWidth=-1, int newHeight=-1);
+  //void              customReset() override;
+  //void              resetSystemObject() override;
+  //void              resetResolution(int fromID=-1, int newWidth=-1, int newHeight=-1) override;
 
 
-  void            loadAudioSettings();
+
+  void              loadAudioSettings();
 
 
-  ofPolyline        waveform;
+  float             plot_data[1024];
 
   int               bufferSize;
   int               sampleRate;
 
 
 protected:
-  mpGraphics        mainRenderer;
+    mpGraphics                mainRenderer;
 
-
-  OBJECT_FACTORY_PROPS
+    OBJECT_FACTORY_PROPS
 
 };
 

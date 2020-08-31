@@ -33,7 +33,7 @@
 #include "VideoObject.h"
 
 //--------------------------------------------------------------
-VideoObject::VideoObject() : PatchObject(){
+VideoObject::VideoObject() : PatchObject("texture object"){
 
     // SET YOUR INLETS/OUTLETS
     this->numInlets  = 1;
@@ -44,17 +44,21 @@ VideoObject::VideoObject() : PatchObject(){
     _outletParams[0] = new ofTexture(); // output
 
     this->initInletsState();
+    this->setIsTextureObj(true);
 
     posX = posY = drawW = drawH = 0.0f;
 
     isTexInited = false;
+
 }
 
 //--------------------------------------------------------------
 void VideoObject::newObject(){
     // SET OBJECT NAME AND INLETS/OUTLETS TYPES/NAMES
-    this->setName(this->objectName);
+    PatchObject::setName( this->objectName );
+
     this->addInlet(VP_LINK_TEXTURE,"texture");
+
     this->addOutlet(VP_LINK_TEXTURE,"texture");
 }
 
@@ -72,7 +76,7 @@ void VideoObject::setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow){
 }
 
 //--------------------------------------------------------------
-void VideoObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects, ofxThreadedFileDialog &fd){
+void VideoObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects){
 
     //////////////////////////////////////////////
     // YOUR UPDATE CODE
@@ -105,32 +109,51 @@ void VideoObject::drawObjectContent(ofxFontStash *font, shared_ptr<ofBaseGLRende
 
     mainRenderer.ofSetColor(255,255,255);
 
-    mainRenderer.ofEnableAlphaBlending();
+    // draw node texture preview with OF
+    drawTexturePreview(glRenderer);
+    //////////////////////////////////////////////
 
-    if(this->inletsConnected[0] && static_cast<ofTexture *>(_inletParams[0])->isAllocated()){
-        if(static_cast<ofTexture *>(_inletParams[0])->getWidth()/static_cast<ofTexture *>(_inletParams[0])->getHeight() >= this->width/this->height){
-            if(static_cast<ofTexture *>(_inletParams[0])->getWidth() > static_cast<ofTexture *>(_inletParams[0])->getHeight()){   // horizontal texture
-                drawW           = this->width;
-                drawH           = (this->width/static_cast<ofTexture *>(_inletParams[0])->getWidth())*static_cast<ofTexture *>(_inletParams[0])->getHeight();
-                posX            = 0;
-                posY            = (this->height-drawH)/2.0f;
-            }else{ // vertical texture
-                drawW           = (static_cast<ofTexture *>(_inletParams[0])->getWidth()*this->height)/static_cast<ofTexture *>(_inletParams[0])->getHeight();
-                drawH           = this->height;
-                posX            = (this->width-drawW)/2.0f;
-                posY            = 0;
-            }
-        }else{ // always considered vertical texture
-            drawW           = (static_cast<ofTexture *>(_inletParams[0])->getWidth()*this->height)/static_cast<ofTexture *>(_inletParams[0])->getHeight();
-            drawH           = this->height;
-            posX            = (this->width-drawW)/2.0f;
-            posY            = 0;
+}
+
+//--------------------------------------------------------------
+void VideoObject::drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ){
+
+    ImGui::SetCurrentContext(_nodeCanvas.getContext());
+
+    // CONFIG GUI inside Menu
+    if(_nodeCanvas.BeginNodeMenu()){
+
+        ImGui::Separator();
+        ImGui::Separator();
+        ImGui::Separator();
+
+        if (ImGui::BeginMenu("CONFIG"))
+        {
+
+            ImGuiEx::ObjectInfo(
+                        "Mosaic Plugin Example - Texture object.",
+                        "#", scaleFactor);
+
+            ImGui::EndMenu();
         }
-        glRenderer->draw(bridgeIn1,posX,posY,0,drawW,drawH,0,0,static_cast<ofTexture *>(_inletParams[0])->getWidth(),static_cast<ofTexture *>(_inletParams[0])->getHeight());
+
+        _nodeCanvas.EndNodeMenu();
     }
 
-    mainRenderer.ofDisableAlphaBlending();
-    //////////////////////////////////////////////
+    // Visualize (Object main view)
+    if( _nodeCanvas.BeginNodeContent(ImGuiExNodeView_Visualise) ){
+
+        // get imgui node translated/scaled position/dimension for drawing textures in OF
+        objOriginX = (ImGui::GetWindowPos().x + ((IMGUI_EX_NODE_PINS_WIDTH_NORMAL - 1)*this->scaleFactor) - _nodeCanvas.GetCanvasTranslation().x)/_nodeCanvas.GetCanvasScale();
+        objOriginY = (ImGui::GetWindowPos().y - _nodeCanvas.GetCanvasTranslation().y)/_nodeCanvas.GetCanvasScale();
+        scaledObjW = this->width - (IMGUI_EX_NODE_PINS_WIDTH_NORMAL*this->scaleFactor/_nodeCanvas.GetCanvasScale());
+        scaledObjH = this->height - ((IMGUI_EX_NODE_HEADER_HEIGHT+IMGUI_EX_NODE_FOOTER_HEIGHT)*this->scaleFactor/_nodeCanvas.GetCanvasScale());
+
+        _nodeCanvas.EndNodeContent();
+    }
+
+    // get imgui canvas zoom
+    canvasZoom = _nodeCanvas.GetCanvasScale();
 
 }
 
@@ -139,6 +162,52 @@ void VideoObject::removeObjectContent(bool removeFileFromData){
 
 }
 
+//--------------------------------------------------------------
+void VideoObject::drawTexturePreview(shared_ptr<ofBaseGLRenderer>& glRenderer){
+    if(scaledObjW*canvasZoom > 90.0f){
+        if(bridgeIn1.isAllocated()){
+            if(bridgeIn1.getWidth()/bridgeIn1.getHeight() >= scaledObjW/scaledObjH){
+                if(bridgeIn1.getWidth() > bridgeIn1.getHeight()){   // horizontal texture
+                    drawW           = scaledObjW;
+                    drawH           = (scaledObjW/bridgeIn1.getWidth())*bridgeIn1.getHeight();
+                    posX            = 0;
+                    posY            = (scaledObjH-drawH)/2.0f;
+                }else{ // vertical texture
+                    drawW           = (bridgeIn1.getWidth()*scaledObjH)/bridgeIn1.getHeight();
+                    drawH           = scaledObjH;
+                    posX            = (scaledObjW-drawW)/2.0f;
+                    posY            = 0;
+                }
+            }else{ // always considered vertical texture
+                drawW               = (bridgeIn1.getWidth()*scaledObjH)/bridgeIn1.getHeight();
+                drawH               = scaledObjH;
+                posX                = (scaledObjW-drawW)/2.0f;
+                posY                = 0;
+            }
+
+            // background
+            mainRenderer.ofSetColor(34,34,34);
+            if(this->numInlets > 0){
+                mainRenderer.ofDrawRectangle(objOriginX-(IMGUI_EX_NODE_PINS_WIDTH_NORMAL*this->scaleFactor/canvasZoom),objOriginY-(IMGUI_EX_NODE_HEADER_HEIGHT*this->scaleFactor/canvasZoom),scaledObjW + (IMGUI_EX_NODE_PINS_WIDTH_NORMAL*this->scaleFactor/canvasZoom),scaledObjH + ((IMGUI_EX_NODE_HEADER_HEIGHT+IMGUI_EX_NODE_FOOTER_HEIGHT)*this->scaleFactor/canvasZoom) );
+            }else{
+                mainRenderer.ofDrawRectangle(objOriginX,objOriginY-(IMGUI_EX_NODE_HEADER_HEIGHT*this->scaleFactor/canvasZoom),scaledObjW,scaledObjH + ((IMGUI_EX_NODE_HEADER_HEIGHT+IMGUI_EX_NODE_FOOTER_HEIGHT)*this->scaleFactor/canvasZoom) );
+            }
+
+            // texture
+            mainRenderer.ofSetColor(255);
+            glRenderer->draw(bridgeIn1,posX+objOriginX,posY+objOriginY,0,drawW-(2*this->scaleFactor),drawH,0,0,static_cast<ofTexture *>(_inletParams[0])->getWidth(),static_cast<ofTexture *>(_inletParams[0])->getHeight());
+        }else{
+            // background
+            mainRenderer.ofSetColor(34,34,34);
+            if(this->numInlets > 0){
+                mainRenderer.ofDrawRectangle(objOriginX-(IMGUI_EX_NODE_PINS_WIDTH_NORMAL*this->scaleFactor/canvasZoom),objOriginY-(IMGUI_EX_NODE_HEADER_HEIGHT*this->scaleFactor/canvasZoom),scaledObjW + (IMGUI_EX_NODE_PINS_WIDTH_NORMAL*this->scaleFactor/canvasZoom),scaledObjH + ((IMGUI_EX_NODE_HEADER_HEIGHT+IMGUI_EX_NODE_FOOTER_HEIGHT)*this->scaleFactor/canvasZoom) );
+            }else{
+                mainRenderer.ofDrawRectangle(objOriginX,objOriginY-(IMGUI_EX_NODE_HEADER_HEIGHT*this->scaleFactor/canvasZoom),scaledObjW,scaledObjH + ((IMGUI_EX_NODE_HEADER_HEIGHT+IMGUI_EX_NODE_FOOTER_HEIGHT)*this->scaleFactor/canvasZoom) );
+            }
+        }
+    }
+}
+
 
 // REGISTER THE OBJECT
-OBJECT_REGISTER( VideoObject, "video object", OFXVP_OBJECT_CAT_VIDEO)
+OBJECT_REGISTER( VideoObject, "texture object", OFXVP_OBJECT_CAT_VIDEO)

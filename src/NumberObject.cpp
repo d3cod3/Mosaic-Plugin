@@ -33,7 +33,7 @@
 #include "NumberObject.h"
 
 //--------------------------------------------------------------
-NumberObject::NumberObject() : PatchObject(){
+NumberObject::NumberObject() : PatchObject("number object"){
 
     // SET YOUR INLETS/OUTLETS
     this->numInlets  = 1;
@@ -52,8 +52,10 @@ NumberObject::NumberObject() : PatchObject(){
 //--------------------------------------------------------------
 void NumberObject::newObject(){
     // SET OBJECT NAME AND INLETS/OUTLETS TYPES/NAMES
-    this->setName(this->objectName);
+    PatchObject::setName( this->objectName );
+
     this->addInlet(VP_LINK_NUMERIC,"number");
+
     this->addOutlet(VP_LINK_NUMERIC,"number");
 }
 
@@ -72,7 +74,7 @@ void NumberObject::setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow){
 }
 
 //--------------------------------------------------------------
-void NumberObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects, ofxThreadedFileDialog &fd){
+void NumberObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects){
 
     //////////////////////////////////////////////
     // YOUR UPDATE CODE
@@ -102,6 +104,41 @@ void NumberObject::drawObjectContent(ofxFontStash *font, shared_ptr<ofBaseGLRend
     // YOUR DRAW CODE
     mainRenderer.ofSetColor(255,255,255);
     //////////////////////////////////////////////
+
+}
+
+//--------------------------------------------------------------
+void NumberObject::drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ){
+
+    ImGui::SetCurrentContext(_nodeCanvas.getContext());
+
+    // CONFIG GUI inside Menu
+    if(_nodeCanvas.BeginNodeMenu()){
+
+        ImGui::Separator();
+        ImGui::Separator();
+        ImGui::Separator();
+
+        if (ImGui::BeginMenu("CONFIG"))
+        {
+
+            ImGuiEx::ObjectInfo(
+                        "Mosaic Plugin Example - Number object.",
+                        "#", scaleFactor);
+
+            ImGui::EndMenu();
+        }
+
+        _nodeCanvas.EndNodeMenu();
+    }
+
+    // Visualize (Object main view)
+    if( _nodeCanvas.BeginNodeContent(ImGuiExNodeView_Visualise) ){
+
+
+
+        _nodeCanvas.EndNodeContent();
+    }
 
 }
 
