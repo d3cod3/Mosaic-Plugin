@@ -38,7 +38,7 @@ Project{
         of.cFlags: []           // flags passed to the c compiler
         of.cxxFlags: []         // flags passed to the c++ compiler
         of.linkerFlags: []      // flags passed to the linker
-        of.defines: []          // defines are passed as -D to the compiler
+        of.defines: ["OFXVP_BUILD_WITH_MINIMAL_OBJECTS"]          // defines are passed as -D to the compiler
         // and can be checked with #ifdef or #if in the code
         of.frameworks: ['/System/Library/Frameworks/CoreMIDI.framework']       // osx only, additional frameworks to link with the project
         of.staticLibraries: []  // static libraries
