@@ -210,4 +210,4 @@ void VideoObject::drawTexturePreview(shared_ptr<ofBaseGLRenderer>& glRenderer){
 
 
 // REGISTER THE OBJECT
-OBJECT_REGISTER( VideoObject, "texture object", OFXVP_OBJECT_CAT_VIDEO)
+OBJECT_REGISTER( VideoObject, "texture object", OFXVP_OBJECT_CAT_TEXTURE)
