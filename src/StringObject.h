@@ -21,6 +21,7 @@ public:
   // object draw
   void              drawObjectContent(ofxFontStash *font, shared_ptr<ofBaseGLRenderer>& glRenderer) override;
   void              drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ) override;
+  void              drawObjectNodeConfig() override;
   // call on remove object
   void              removeObjectContent(bool removeFileFromData=false) override;
 
@@ -43,6 +44,8 @@ public:
 
 protected:
     mpGraphics                mainRenderer;
+    size_t                      startTime;
+    size_t                      wait;
 
     OBJECT_FACTORY_PROPS
 

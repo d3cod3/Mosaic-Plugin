@@ -47,6 +47,9 @@ StringObject::StringObject() : PatchObject("string object"){
 
     this->initInletsState();
 
+    startTime = ofGetElapsedTimeMillis();
+    wait = 200;
+
 }
 
 //--------------------------------------------------------------
@@ -122,9 +125,7 @@ void StringObject::drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ){
         if (ImGui::BeginMenu("CONFIG"))
         {
 
-            ImGuiEx::ObjectInfo(
-                        "Mosaic Plugin Example - String object.",
-                        "#", scaleFactor);
+            drawObjectNodeConfig();
 
             ImGui::EndMenu();
         }
@@ -140,6 +141,16 @@ void StringObject::drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ){
         _nodeCanvas.EndNodeContent();
     }
 
+}
+
+//--------------------------------------------------------------
+void StringObject::drawObjectNodeConfig(){
+    // delay needed for some strange bug related with inspector??? ( crash when creating object with inspector already open ONLY ) - Need to check why
+    if(ofGetElapsedTimeMillis()-startTime > wait){
+        ImGuiEx::ObjectInfo(
+                "Mosaic Plugin Example - String object.",
+                "#", scaleFactor);
+    }
 }
 
 //--------------------------------------------------------------

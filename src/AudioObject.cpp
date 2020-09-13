@@ -53,6 +53,9 @@ AudioObject::AudioObject() : PatchObject("sound object"){
     isAudioOUTObject        = true;
     isPDSPPatchableObject   = true;
 
+    startTime = ofGetElapsedTimeMillis();
+    wait = 200;
+
 }
 
 //--------------------------------------------------------------
@@ -138,9 +141,7 @@ void AudioObject::drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ){
         if (ImGui::BeginMenu("CONFIG"))
         {
 
-            ImGuiEx::ObjectInfo(
-                        "Mosaic Plugin Example - Audio object.",
-                        "#", scaleFactor);
+            drawObjectNodeConfig();
 
             ImGui::EndMenu();
         }
@@ -160,6 +161,16 @@ void AudioObject::drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ){
         _nodeCanvas.EndNodeContent();
     }
 
+}
+
+//--------------------------------------------------------------
+void AudioObject::drawObjectNodeConfig(){
+    // delay needed for some strange bug related with inspector??? ( crash when creating object with inspector already open ONLY ) - Need to check why
+    if(ofGetElapsedTimeMillis()-startTime > wait){
+        ImGuiEx::ObjectInfo(
+                "Mosaic Plugin Example - Audio object.",
+                "#", scaleFactor);
+    }
 }
 
 //--------------------------------------------------------------

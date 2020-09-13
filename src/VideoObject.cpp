@@ -50,6 +50,9 @@ VideoObject::VideoObject() : PatchObject("texture object"){
 
     isTexInited = false;
 
+    startTime = ofGetElapsedTimeMillis();
+    wait = 200;
+
 }
 
 //--------------------------------------------------------------
@@ -130,9 +133,7 @@ void VideoObject::drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ){
         if (ImGui::BeginMenu("CONFIG"))
         {
 
-            ImGuiEx::ObjectInfo(
-                        "Mosaic Plugin Example - Texture object.",
-                        "#", scaleFactor);
+            drawObjectNodeConfig();
 
             ImGui::EndMenu();
         }
@@ -155,6 +156,16 @@ void VideoObject::drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ){
     // get imgui canvas zoom
     canvasZoom = _nodeCanvas.GetCanvasScale();
 
+}
+
+//--------------------------------------------------------------
+void VideoObject::drawObjectNodeConfig(){
+    // delay needed for some strange bug related with inspector??? ( crash when creating object with inspector already open ONLY ) - Need to check why
+    if(ofGetElapsedTimeMillis()-startTime > wait){
+        ImGuiEx::ObjectInfo(
+                "Mosaic Plugin Example - Texture object.",
+                "#", scaleFactor);
+    }
 }
 
 //--------------------------------------------------------------
