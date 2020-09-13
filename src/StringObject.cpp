@@ -1,10 +1,11 @@
 /*==============================================================================
 
+    Mosaic: Live Visual Patching Creative-Coding Platform
     ofxVisualProgramming: A visual programming patching environment for OF
 
     Copyright (c) 2020 Emanuele Mazza aka n3m3da <emanuelemazza@d3cod3.org>
 
-    ofxVisualProgramming is distributed under the MIT License.
+    Mosaic and ofxVisualProgramming is distributed under the MIT License.
     This gives everyone the freedoms to use ofxVisualProgramming in any context:
     commercial or non-commercial, public or private, open or closed source.
 
@@ -26,7 +27,16 @@
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
     DEALINGS IN THE SOFTWARE.
 
-    See https://github.com/d3cod3/ofxVisualProgramming for documentation
+    See https://github.com/d3cod3/Mosaic-Plugin for documentation
+
+    Name:           StringObject
+
+    Desc:           Mosaic Plugin Example - String object
+
+    Developed by:   Emanuele Mazza aka n3m3da
+
+    Github:         https://github.com/d3cod3
+    WWW:            http://www.d3cod3.org
 
 ==============================================================================*/
 
