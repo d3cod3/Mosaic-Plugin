@@ -1,10 +1,11 @@
 /*==============================================================================
 
+    Mosaic: Live Visual Patching Creative-Coding Platform
     ofxVisualProgramming: A visual programming patching environment for OF
 
     Copyright (c) 2020 Emanuele Mazza aka n3m3da <emanuelemazza@d3cod3.org>
 
-    ofxVisualProgramming is distributed under the MIT License.
+    Mosaic and ofxVisualProgramming is distributed under the MIT License.
     This gives everyone the freedoms to use ofxVisualProgramming in any context:
     commercial or non-commercial, public or private, open or closed source.
 
@@ -26,14 +27,23 @@
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
     DEALINGS IN THE SOFTWARE.
 
-    See https://github.com/d3cod3/ofxVisualProgramming for documentation
+    See https://github.com/d3cod3/Mosaic-Plugin for documentation
+
+    Name:           AudioObject
+
+    Desc:           Mosaic Plugin Example - Audio object
+
+    Developed by:   Emanuele Mazza aka n3m3da
+
+    Github:         https://github.com/d3cod3
+    WWW:            http://www.d3cod3.org
 
 ==============================================================================*/
 
 #include "AudioObject.h"
 
 //--------------------------------------------------------------
-AudioObject::AudioObject() : PatchObject(){
+AudioObject::AudioObject() : PatchObject("sound object"){
 
     // SET YOUR INLETS/OUTLETS
     this->numInlets  = 1;
@@ -53,13 +63,18 @@ AudioObject::AudioObject() : PatchObject(){
     isAudioOUTObject        = true;
     isPDSPPatchableObject   = true;
 
+    startTime = ofGetElapsedTimeMillis();
+    wait = 200;
+
 }
 
 //--------------------------------------------------------------
 void AudioObject::newObject(){
     // SET OBJECT NAME AND INLETS/OUTLETS TYPES/NAMES
-    this->setName(this->objectName);
+    PatchObject::setName( this->objectName );
+
     this->addInlet(VP_LINK_AUDIO,"signal");
+
     this->addOutlet(VP_LINK_AUDIO,"signal");
     this->addOutlet(VP_LINK_AUDIO,"signal");
     this->addOutlet(VP_LINK_ARRAY,"dataBuffer");
@@ -76,7 +91,6 @@ void AudioObject::setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow){
     //////////////////////////////////////////////
     // YOUR SETUP CODE
     loadAudioSettings();
-
     //////////////////////////////////////////////
 }
 
@@ -87,7 +101,7 @@ void AudioObject::setupAudioOutObjectContent(pdsp::Engine &engine){
 }
 
 //--------------------------------------------------------------
-void AudioObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects, ofxThreadedFileDialog &fd){
+void AudioObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects){
 
     //////////////////////////////////////////////
     // YOUR UPDATE CODE
@@ -117,16 +131,56 @@ void AudioObject::drawObjectContent(ofxFontStash *font, shared_ptr<ofBaseGLRende
 
     //////////////////////////////////////////////
     // YOUR DRAW CODE
-    mainRenderer.ofEnableAlphaBlending();
-    if(this->inletsConnected[0]){
-        mainRenderer.ofSetColor(255,255,120,10);
-        mainRenderer.ofDrawRectangle(0,this->height,this->width,-this->height * ofClamp(static_cast<ofSoundBuffer *>(_inletParams[0])->getRMSAmplitude(),0.0,1.0));
-    }
-    mainRenderer.ofSetColor(255,255,120);
-    mainRenderer.draw(waveform);
-    mainRenderer.ofDisableAlphaBlending();
+
     //////////////////////////////////////////////
 
+}
+
+//--------------------------------------------------------------
+void AudioObject::drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ){
+
+    ImGui::SetCurrentContext(_nodeCanvas.getContext());
+
+    // CONFIG GUI inside Menu
+    if(_nodeCanvas.BeginNodeMenu()){
+
+        ImGui::Separator();
+        ImGui::Separator();
+        ImGui::Separator();
+
+        if (ImGui::BeginMenu("CONFIG"))
+        {
+
+            drawObjectNodeConfig();
+
+            ImGui::EndMenu();
+        }
+
+        _nodeCanvas.EndNodeMenu();
+    }
+
+    // Visualize (Object main view)
+    if( _nodeCanvas.BeginNodeContent(ImGuiExNodeView_Visualise) ){
+
+        // draw waveform
+        ImGuiEx::drawWaveform(_nodeCanvas.getNodeDrawList(), ImGui::GetWindowSize(), plot_data, 1024, 1.3f, IM_COL32(255,255,120,255), this->scaleFactor);
+
+        // draw signal RMS amplitude
+        _nodeCanvas.getNodeDrawList()->AddRectFilled(ImGui::GetWindowPos()+ImVec2(0,ImGui::GetWindowSize().y),ImGui::GetWindowPos()+ImVec2(ImGui::GetWindowSize().x,ImGui::GetWindowSize().y * (1.0f - ofClamp(static_cast<ofSoundBuffer *>(_inletParams[0])->getRMSAmplitude(),0.0,1.0))),IM_COL32(255,255,120,12));
+
+        _nodeCanvas.EndNodeContent();
+    }
+
+}
+
+//--------------------------------------------------------------
+void AudioObject::drawObjectNodeConfig(){
+    // delay needed for some strange bug related with inspector??? ( crash when creating object with inspector already open ONLY ) - Need to check why
+    if(ofGetElapsedTimeMillis()-startTime > wait){
+        ImGuiEx::ObjectInfo(
+                "Mosaic Plugin Example - Audio object.",
+                "#", scaleFactor);
+    }
 }
 
 //--------------------------------------------------------------
@@ -159,16 +213,13 @@ void AudioObject::audioInObject(ofSoundBuffer &inputBuffer){
 
 //--------------------------------------------------------------
 void AudioObject::audioOutObject(ofSoundBuffer &outBuffer){
-    waveform.clear();
     if(this->inletsConnected[0]){
         *static_cast<ofSoundBuffer *>(_outletParams[0]) = *static_cast<ofSoundBuffer *>(_inletParams[0]);
         *static_cast<ofSoundBuffer *>(_outletParams[1]) = *static_cast<ofSoundBuffer *>(_inletParams[0]);
 
         for(size_t i = 0; i < static_cast<ofSoundBuffer *>(_inletParams[0])->getNumFrames(); i++) {
             float sample = static_cast<ofSoundBuffer *>(_inletParams[0])->getSample(i,0);
-            float x = ofMap(i, 0, static_cast<ofSoundBuffer *>(_inletParams[0])->getNumFrames(), 0, this->width);
-            float y = ofMap(hardClip(sample), -1, 1, 0, this->height);
-            waveform.addVertex(x, y);
+            plot_data[i] = hardClip(sample);
 
             // SIGNAL BUFFER DATA
             static_cast<vector<float> *>(_outletParams[2])->at(i) = sample;

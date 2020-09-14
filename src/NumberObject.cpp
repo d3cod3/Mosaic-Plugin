@@ -1,10 +1,11 @@
 /*==============================================================================
 
+    Mosaic: Live Visual Patching Creative-Coding Platform
     ofxVisualProgramming: A visual programming patching environment for OF
 
     Copyright (c) 2020 Emanuele Mazza aka n3m3da <emanuelemazza@d3cod3.org>
 
-    ofxVisualProgramming is distributed under the MIT License.
+    Mosaic and ofxVisualProgramming is distributed under the MIT License.
     This gives everyone the freedoms to use ofxVisualProgramming in any context:
     commercial or non-commercial, public or private, open or closed source.
 
@@ -26,14 +27,23 @@
     FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
     DEALINGS IN THE SOFTWARE.
 
-    See https://github.com/d3cod3/ofxVisualProgramming for documentation
+    See https://github.com/d3cod3/Mosaic-Plugin for documentation
+
+    Name:           NumberObject
+
+    Desc:           Mosaic Plugin Example - Number object
+
+    Developed by:   Emanuele Mazza aka n3m3da
+
+    Github:         https://github.com/d3cod3
+    WWW:            http://www.d3cod3.org
 
 ==============================================================================*/
 
 #include "NumberObject.h"
 
 //--------------------------------------------------------------
-NumberObject::NumberObject() : PatchObject(){
+NumberObject::NumberObject() : PatchObject("number object"){
 
     // SET YOUR INLETS/OUTLETS
     this->numInlets  = 1;
@@ -47,13 +57,18 @@ NumberObject::NumberObject() : PatchObject(){
 
     this->initInletsState();
 
+    startTime = ofGetElapsedTimeMillis();
+    wait = 200;
+
 }
 
 //--------------------------------------------------------------
 void NumberObject::newObject(){
     // SET OBJECT NAME AND INLETS/OUTLETS TYPES/NAMES
-    this->setName(this->objectName);
+    PatchObject::setName( this->objectName );
+
     this->addInlet(VP_LINK_NUMERIC,"number");
+
     this->addOutlet(VP_LINK_NUMERIC,"number");
 }
 
@@ -72,7 +87,7 @@ void NumberObject::setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow){
 }
 
 //--------------------------------------------------------------
-void NumberObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects, ofxThreadedFileDialog &fd){
+void NumberObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects){
 
     //////////////////////////////////////////////
     // YOUR UPDATE CODE
@@ -106,10 +121,53 @@ void NumberObject::drawObjectContent(ofxFontStash *font, shared_ptr<ofBaseGLRend
 }
 
 //--------------------------------------------------------------
+void NumberObject::drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ){
+
+    ImGui::SetCurrentContext(_nodeCanvas.getContext());
+
+    // CONFIG GUI inside Menu
+    if(_nodeCanvas.BeginNodeMenu()){
+
+        ImGui::Separator();
+        ImGui::Separator();
+        ImGui::Separator();
+
+        if (ImGui::BeginMenu("CONFIG"))
+        {
+
+            drawObjectNodeConfig();
+
+            ImGui::EndMenu();
+        }
+
+        _nodeCanvas.EndNodeMenu();
+    }
+
+    // Visualize (Object main view)
+    if( _nodeCanvas.BeginNodeContent(ImGuiExNodeView_Visualise) ){
+
+
+
+        _nodeCanvas.EndNodeContent();
+    }
+
+}
+
+//--------------------------------------------------------------
+void NumberObject::drawObjectNodeConfig(){
+    // delay needed for some strange bug related with inspector??? ( crash when creating object with inspector already open ONLY ) - Need to check why
+    if(ofGetElapsedTimeMillis()-startTime > wait){
+        ImGuiEx::ObjectInfo(
+                    "Mosaic Plugin Example - Number object.",
+                    "#", scaleFactor);
+    }
+}
+
+//--------------------------------------------------------------
 void NumberObject::removeObjectContent(bool removeFileFromData){
 
 }
 
 
 // REGISTER THE OBJECT
-OBJECT_REGISTER( NumberObject, "number object", OFXVP_OBJECT_CAT_DATA)
+OBJECT_REGISTER( NumberObject, "number object", OFXVP_OBJECT_CAT_MATH)
