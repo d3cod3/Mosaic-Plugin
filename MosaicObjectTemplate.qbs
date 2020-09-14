@@ -9,7 +9,7 @@ Project{
     property string of_root: '../../..'
 
     ofApp {
-        name: "MosaicObjectTemplate"
+        name: "MosaicObjectTemplate"  // <--- The name of your Plugin / Plugin Package
 
         type: "dynamiclibrary"
 
