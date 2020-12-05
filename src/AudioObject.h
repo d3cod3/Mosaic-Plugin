@@ -63,7 +63,7 @@ public:
   // object update
   void              updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects) override;
   // object draw
-  void              drawObjectContent(ofxFontStash *font, shared_ptr<ofBaseGLRenderer>& glRenderer) override;
+  void              drawObjectContent(ofTrueTypeFont *font, shared_ptr<ofBaseGLRenderer>& glRenderer) override;
   void              drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ) override;
   void              drawObjectNodeConfig() override;
   // call on remove object
