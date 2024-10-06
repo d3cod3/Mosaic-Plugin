@@ -88,6 +88,7 @@ void StringObject::setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow){
 
 //--------------------------------------------------------------
 void StringObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects){
+    unusedArgs(patchObjects);
 
     //////////////////////////////////////////////
     // YOUR UPDATE CODE
@@ -100,6 +101,7 @@ void StringObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchOb
 
 //--------------------------------------------------------------
 void StringObject::drawObjectContent(ofTrueTypeFont *font, shared_ptr<ofBaseGLRenderer>& glRenderer){
+    unusedArgs(font,glRenderer);
 
     /*
         Due to rendering sharing needs, use internal mpGraphics methods
@@ -165,7 +167,7 @@ void StringObject::drawObjectNodeConfig(){
 
 //--------------------------------------------------------------
 void StringObject::removeObjectContent(bool removeFileFromData){
-
+    unusedArgs(removeFileFromData);
 }
 
 

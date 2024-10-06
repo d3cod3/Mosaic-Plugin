@@ -88,6 +88,7 @@ void NumberObject::setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow){
 
 //--------------------------------------------------------------
 void NumberObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects){
+    unusedArgs(patchObjects);
 
     //////////////////////////////////////////////
     // YOUR UPDATE CODE
@@ -100,6 +101,7 @@ void NumberObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchOb
 
 //--------------------------------------------------------------
 void NumberObject::drawObjectContent(ofTrueTypeFont *font, shared_ptr<ofBaseGLRenderer>& glRenderer){
+    unusedArgs(font,glRenderer);
 
     /*
         Due to rendering sharing needs, use internal mpGraphics methods
@@ -165,7 +167,7 @@ void NumberObject::drawObjectNodeConfig(){
 
 //--------------------------------------------------------------
 void NumberObject::removeObjectContent(bool removeFileFromData){
-
+    unusedArgs(removeFileFromData);
 }
 
 

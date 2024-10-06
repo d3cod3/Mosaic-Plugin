@@ -96,12 +96,15 @@ void AudioObject::setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow){
 
 //--------------------------------------------------------------
 void AudioObject::setupAudioOutObjectContent(pdsp::Engine &engine){
+    unusedArgs(engine);
+
     this->pdspIn[0] >> this->pdspOut[0];
     this->pdspIn[0] >> this->pdspOut[1];
 }
 
 //--------------------------------------------------------------
 void AudioObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects){
+    unusedArgs(patchObjects);
 
     //////////////////////////////////////////////
     // YOUR UPDATE CODE
@@ -116,6 +119,7 @@ void AudioObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObj
 
 //--------------------------------------------------------------
 void AudioObject::drawObjectContent(ofTrueTypeFont *font, shared_ptr<ofBaseGLRenderer>& glRenderer){
+    unusedArgs(font,glRenderer);
 
     /*
         Due to rendering sharing needs, use internal mpGraphics methods
@@ -185,14 +189,14 @@ void AudioObject::drawObjectNodeConfig(){
 
 //--------------------------------------------------------------
 void AudioObject::removeObjectContent(bool removeFileFromData){
-
+    unusedArgs(removeFileFromData);
 }
 
 //--------------------------------------------------------------
 void AudioObject::loadAudioSettings(){
     ofxXmlSettings XML;
 
-    if (XML.loadFile(patchFile)){
+    if (XML.load(patchFile)){
         if (XML.pushTag("settings")){
             sampleRate = XML.getValue("sample_rate_in",0);
             bufferSize = XML.getValue("buffer_size",0);
@@ -208,11 +212,13 @@ void AudioObject::loadAudioSettings(){
 
 //--------------------------------------------------------------
 void AudioObject::audioInObject(ofSoundBuffer &inputBuffer){
-
+    unusedArgs(inputBuffer);
 }
 
 //--------------------------------------------------------------
 void AudioObject::audioOutObject(ofSoundBuffer &outBuffer){
+    unusedArgs(outBuffer);
+
     if(this->inletsConnected[0]){
         *static_cast<ofSoundBuffer *>(_outletParams[0]) = *static_cast<ofSoundBuffer *>(_inletParams[0]);
         *static_cast<ofSoundBuffer *>(_outletParams[1]) = *static_cast<ofSoundBuffer *>(_inletParams[0]);

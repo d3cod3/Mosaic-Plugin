@@ -90,6 +90,7 @@ void VideoObject::setupObjectContent(shared_ptr<ofAppGLFWWindow> &mainWindow){
 
 //--------------------------------------------------------------
 void VideoObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObjects){
+    unusedArgs(patchObjects);
 
     //////////////////////////////////////////////
     // YOUR UPDATE CODE
@@ -109,6 +110,7 @@ void VideoObject::updateObjectContent(map<int,shared_ptr<PatchObject>> &patchObj
 
 //--------------------------------------------------------------
 void VideoObject::drawObjectContent(ofTrueTypeFont *font, shared_ptr<ofBaseGLRenderer>& glRenderer){
+    unusedArgs(font,glRenderer);
 
     /*
         Due to renderer sharing needs, use internal mpGraphics methods
@@ -180,7 +182,7 @@ void VideoObject::drawObjectNodeConfig(){
 
 //--------------------------------------------------------------
 void VideoObject::removeObjectContent(bool removeFileFromData){
-
+    unusedArgs(removeFileFromData);
 }
 
 //--------------------------------------------------------------
