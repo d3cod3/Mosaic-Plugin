@@ -63,6 +63,8 @@ VideoObject::VideoObject() : PatchObject("texture object"){
     startTime = ofGetElapsedTimeMillis();
     wait = 200;
 
+    this->setIsResizable(true);
+
 }
 
 //--------------------------------------------------------------
@@ -159,11 +161,11 @@ void VideoObject::drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ){
         // draw node texture preview with imGui
         ImVec2 window_pos = ImGui::GetWindowPos()+ImVec2(IMGUI_EX_NODE_PINS_WIDTH_NORMAL, IMGUI_EX_NODE_HEADER_HEIGHT);
 
-        if(this->inletsConnected[0] && static_cast<ofTexture *>(_outletParams[0])->isAllocated()){
-            calcTextureDims(*static_cast<ofTexture *>(_outletParams[0]), posX, posY, drawW, drawH, objOriginX, objOriginY, scaledObjW, scaledObjH, canvasZoom, this->scaleFactor);
+        if(this->inletsConnected[0] && bridgeIn1.isAllocated()){
+            calcTextureDims(bridgeIn1, posX, posY, drawW, drawH, objOriginX, objOriginY, scaledObjW, scaledObjH, canvasZoom, this->scaleFactor);
             _nodeCanvas.getNodeDrawList()->AddRectFilled(window_pos,window_pos+ImVec2(scaledObjW*this->scaleFactor*_nodeCanvas.GetCanvasScale(), scaledObjH*this->scaleFactor*_nodeCanvas.GetCanvasScale()),ImGui::GetColorU32(ImVec4(0.0f, 0.0f, 0.0f, 1.0f)));
             ImGui::SetCursorPos(ImVec2(posX+(IMGUI_EX_NODE_PINS_WIDTH_NORMAL*this->scaleFactor), posY+(IMGUI_EX_NODE_HEADER_HEIGHT*this->scaleFactor)));
-            ImGui::Image((ImTextureID)(uintptr_t)static_cast<ofTexture *>(_outletParams[0])->getTextureData().textureID, ImVec2(drawW, drawH));
+            ImGui::Image((ImTextureID)(uintptr_t)bridgeIn1.getTextureData().textureID, ImVec2(drawW, drawH));
         }else{
             _nodeCanvas.getNodeDrawList()->AddRectFilled(window_pos,window_pos+ImVec2(scaledObjW*this->scaleFactor*_nodeCanvas.GetCanvasScale(), scaledObjH*this->scaleFactor*_nodeCanvas.GetCanvasScale()),ImGui::GetColorU32(ImVec4(0.0f, 0.0f, 0.0f, 1.0f)));
         }
