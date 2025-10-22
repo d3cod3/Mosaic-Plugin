@@ -59,6 +59,8 @@ AudioObject::AudioObject() : PatchObject("sound object"){
 
     this->initInletsState();
 
+    this->width             *= 2;
+
     isAudioINObject         = true;
     isAudioOUTObject        = true;
     isPDSPPatchableObject   = true;
@@ -167,7 +169,7 @@ void AudioObject::drawObjectNodeGui( ImGuiEx::NodeCanvas& _nodeCanvas ){
     if( _nodeCanvas.BeginNodeContent(ImGuiExNodeView_Visualise) ){
 
         // draw waveform
-        ImGuiEx::drawWaveform(_nodeCanvas.getNodeDrawList(), ImGui::GetWindowSize(), plot_data, 1024, 1.3f, IM_COL32(255,255,120,255), this->scaleFactor);
+        ImGuiEx::drawWaveform(_nodeCanvas.getNodeDrawList(), ImGui::GetWindowSize(), plot_data, bufferSize, 1.3f, IM_COL32(255,255,120,255), this->scaleFactor);
 
         // draw signal RMS amplitude
         _nodeCanvas.getNodeDrawList()->AddRectFilled(ImGui::GetWindowPos()+ImVec2(0,ImGui::GetWindowSize().y),ImGui::GetWindowPos()+ImVec2(ImGui::GetWindowSize().x,ImGui::GetWindowSize().y * (1.0f - ofClamp(static_cast<ofSoundBuffer *>(_inletParams[0])->getRMSAmplitude(),0.0,1.0))),IM_COL32(255,255,120,12));
@@ -194,19 +196,14 @@ void AudioObject::removeObjectContent(bool removeFileFromData){
 
 //--------------------------------------------------------------
 void AudioObject::loadAudioSettings(){
-    ofxXmlSettings XML;
+    ofxVPXml.loadMosaicPatch(this->patchFile);
 
-    if (XML.load(patchFile)){
-        if (XML.pushTag("settings")){
-            sampleRate = XML.getValue("sample_rate_in",0);
-            bufferSize = XML.getValue("buffer_size",0);
-
-            for(int i=0;i<bufferSize;i++){
-                static_cast<vector<float> *>(_outletParams[2])->push_back(0.0f);
-            }
-
-            XML.popTag();
-        }
+    sampleRate = this->ofxVPXml.getMosaicConfigInt("sample_rate_in");
+    bufferSize = this->ofxVPXml.getMosaicConfigInt("buffer_size");
+    plot_data = new float[bufferSize];
+    for(int i=0;i<bufferSize;i++){
+        ofxVP_CAST_PIN_PTR<vector<float>>(_outletParams[2])->push_back(0.0f);
+        plot_data[i] = 0.0f;
     }
 }
 
